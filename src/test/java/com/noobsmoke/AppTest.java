@@ -1,38 +1,31 @@
 package com.noobsmoke;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.Test;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
+import java.util.ArrayList;
+import java.util.List;
+
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.Mockito.*;
+
+public class AppTest {
+
+    private final List<String> mockList = mock();
+    private final List<String> realList = new ArrayList<>();
+
+    @Test
+    void myFirstTestWithMock() {
+        mockList.add("hello");
+        when(mockList.get(0)).thenReturn("hello");
+        verify(mockList).add("hello");
+        assertThat(mockList.get(0)).isEqualTo("hello");
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
+    @Test
+    void myFirstTestWithoutMock() {
+        realList.add("Hello");
+        assertThat(realList).hasSize(1);
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
 }
