@@ -3,27 +3,30 @@ package com.noobsmoke;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
-
+    @InjectMocks
     private OrderService underTest;
     @Mock
     private PaymentProcessor stripePaymentProcessor;
-    private AutoCloseable autoCloseable;
 
-    @BeforeEach
-    void setUp() {
-        autoCloseable = MockitoAnnotations.openMocks(this);
-        underTest = new OrderService(stripePaymentProcessor);
-    }
+
+//    @BeforeEach
+//    void setUp() {
+//        underTest = new OrderService(stripePaymentProcessor);
+//    }
 
     @Test
     void amountIsChargedTest() {
@@ -34,8 +37,4 @@ public class OrderServiceTest {
         assertTrue(answer);
     }
 
-    @AfterEach
-    void tearDown() throws Exception {
-        autoCloseable.close();
-    }
 }
