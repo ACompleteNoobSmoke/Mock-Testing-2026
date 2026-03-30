@@ -28,4 +28,29 @@ public class AppTest {
         assertThat(realList).hasSize(1);
     }
 
+
+    @Test
+    void shouldVerifyNoInteractions() {
+        List<String> mockOfList = mock();
+        verifyNoInteractions(mockOfList);
+    }
+
+    @Test
+    void shouldVerifyNoMoreInteractions() {
+        List<String> list = mock();
+        list.clear();
+        verify(list).clear();
+        verifyNoMoreInteractions(list);
+    }
+
+    @Test
+    void shouldVerifyInteractionMode() {
+        List<String> list = mock();
+        list.clear();
+        list.clear();
+
+        verify(list, times(2)).clear();
+        verifyNoMoreInteractions(list);
+    }
+
 }
