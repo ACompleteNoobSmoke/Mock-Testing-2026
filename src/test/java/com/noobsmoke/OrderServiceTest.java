@@ -64,6 +64,28 @@ public class OrderServiceTest {
     }
 
     @Test
+    void chainedStubbing() {
+        List<String> mockList = mock();
+
+        given(mockList.size()).willReturn(1, 2, 3, 4);
+
+        assertThat(mockList.size()).isEqualTo(1);
+        assertThat(mockList.size()).isEqualTo(2);
+        assertThat(mockList.size()).isEqualTo(3);
+        assertThat(mockList.size()).isEqualTo(4);
+        assertThat(mockList.size()).isEqualTo(4);
+    }
+
+    @Test
+    void shouldReturnCustomAnswer() {
+        List<String> mockList = mock();
+        given(mockList.get(anyInt())).will(invocationOnMock ->
+                "ACompleteNoobSmoke " + invocationOnMock.getArgument(0));
+        assertThat(mockList.get(0)).isEqualTo("ACompleteNoobSmoke 0");
+        assertThat(mockList.get(1)).isEqualTo("ACompleteNoobSmoke 1");
+    }
+
+    @Test
     void amountIsChargedTest() {
         BigDecimal bigDecimal = BigDecimal.valueOf(1000.12);
         User user = new User(1, "Osaretin");
