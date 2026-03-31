@@ -4,9 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -30,6 +28,9 @@ public class OrderServiceTest {
     @Mock
     private Random random;
 
+    @Captor
+    private ArgumentCaptor<Order> orderArgumentCaptor;
+
 
 //    @BeforeEach
 //    void setUp() {
@@ -40,11 +41,30 @@ public class OrderServiceTest {
     void amountIsChargedTest() {
         BigDecimal bigDecimal = BigDecimal.valueOf(1000.12);
         User user = new User(1, "Osaretin");
-        Order order = new Order(1, user, BigDecimal.ONE, ZonedDateTime.now());
         when(stripePaymentProcessor.charge(bigDecimal)).thenReturn(true);
         when(orderRepository.save(any())).thenReturn(1);
         boolean answer = underTest.processOrder(user, bigDecimal);
         verify(stripePaymentProcessor).charge(bigDecimal);
+        verify(orderRepository).save(assertArg(order1 -> {
+            assertThat(order1.amount()).isEqualTo(bigDecimal);
+            assertThat(order1.user()).isEqualTo(user);
+        }));
+        assertTrue(answer);
+    }
+
+    @Test
+    void amountIsChargedWithArgCaptorTest() {
+        BigDecimal bigDecimal = BigDecimal.valueOf(1000.12);
+        User user = new User(1, "Osaretin");
+        when(stripePaymentProcessor.charge(bigDecimal)).thenReturn(true);
+        when(orderRepository.save(any())).thenReturn(1);
+        boolean answer = underTest.processOrder(user, bigDecimal);
+        verify(stripePaymentProcessor).charge(bigDecimal);
+//        ArgumentCaptor<Order> orderArgumentCaptor = ArgumentCaptor.forClass(Order.class);
+        verify(orderRepository).save(orderArgumentCaptor.capture());
+        Order captoredOrder = orderArgumentCaptor.getValue();
+        assertThat(captoredOrder.amount()).isEqualTo(bigDecimal);
+        assertThat(captoredOrder.user()).isEqualTo(user);
         assertTrue(answer);
     }
 
