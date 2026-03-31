@@ -9,12 +9,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +39,29 @@ public class OrderServiceTest {
 //    void setUp() {
 //        underTest = new OrderService(stripePaymentProcessor);
 //    }
+
+    @Test
+    void mockitoDBBExample() {
+        List<String> mockList = mock();
+
+        given(mockList.get(0)).willReturn("Spiderman");
+
+        String actual = mockList.get(0);
+
+        then(mockList).should().get(0);
+
+        assertThat(actual).isEqualTo("Spiderman");
+
+    }
+
+    @Test
+    void shouldThrowWhenChargeFailsWithMockitoBDD() {
+        given(stripePaymentProcessor.charge(any(BigDecimal.class))).willReturn(false);
+        String exMessage = assertThrows(IllegalStateException.class, () -> underTest.processOrder(any(User.class), BigDecimal.ONE)).getMessage();
+        assertEquals("Payment Failed", exMessage);
+        then(stripePaymentProcessor).should().charge(any(BigDecimal.class));
+        then(orderRepository).shouldHaveNoInteractions();
+    }
 
     @Test
     void amountIsChargedTest() {
