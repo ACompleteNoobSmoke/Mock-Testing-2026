@@ -8,11 +8,16 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -140,6 +145,31 @@ public class OrderServiceTest {
         when(mockMap.put(anyString(), eq("Jackie Chan"))).thenReturn("Hello");
         assertThat(mockMap.put("Hello", "Jackie Chan")).isEqualTo("Hello");
         verify(mockMap).put("Hello", "Jackie Chan");
+    }
+
+    @Test
+    void async() {
+        Runnable mockRunnable = mock();
+
+        Executors.
+                newSingleThreadScheduledExecutor()
+                .schedule(mockRunnable, 200, TimeUnit.MILLISECONDS);
+
+        BDDMockito.then(mockRunnable).should(timeout(200)).run();
+    }
+
+    @Test
+    void canAdvanceClock() {
+        Clock clock = mock();
+        ZoneId zonedId = ZoneId.of("Europe/London");
+        ZonedDateTime fixedZDT = ZonedDateTime.of(2027, 1, 1, 0, 0, 0, 0, zonedId);
+        given(clock.getZone()).willReturn(zonedId);
+        given(clock.instant()).willReturn(fixedZDT.toInstant());
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(clock);
+        System.out.println(zonedDateTime);
+        given(clock.instant()).willReturn(zonedDateTime.plusMinutes(15).toInstant());
+        System.out.println(ZonedDateTime.now(clock));
+
     }
 
 }
